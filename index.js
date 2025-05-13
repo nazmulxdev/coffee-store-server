@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 import "dotenv/config";
 
 const app = express();
@@ -32,12 +32,29 @@ async function run() {
     // create collection
     const coffeesCollection = client.db("coffeeDB").collection("coffees");
 
+    // get operation
+
+    app.get("/coffees", async (req, res) => {
+      const cursor = coffeesCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     // create or post operation
 
     app.post("/coffees", async (req, res) => {
       const newCoffee = req.body;
       console.log(newCoffee);
       const result = await coffeesCollection.insertOne(newCoffee);
+      res.send(result);
+    });
+
+    app.delete("/coffees/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await coffeesCollection.deleteOne(query);
       res.send(result);
     });
   } finally {
