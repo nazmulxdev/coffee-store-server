@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD} @cluster0.qtoljre.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.qtoljre.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 console.log(process.env.DB_USER);
 console.log(process.env.DB_PASSWORD);
@@ -29,8 +29,19 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+    // create collection
+    const coffeesCollection = client.db("coffeeDB").collection("coffees");
+
+    // create or post operation
+
+    app.post("/coffees", async (req, res) => {
+      const newCoffee = req.body;
+      console.log(newCoffee);
+      const result = await coffeesCollection.insertOne(newCoffee);
+      res.send(result);
+    });
   } finally {
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
